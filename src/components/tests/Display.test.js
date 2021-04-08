@@ -1,17 +1,76 @@
 import React from 'react';
-import {render, screen} from '@testing-library/react';
+import {render, screen, waitFor} from '@testing-library/react';
+import mockFetchShow from './../../api/fetchShow';
+import userEvent from '@testing-library/user-event';
 import Display from '../Display';
 
-test('render display compoenent without errors', () => {
-  render(<Display />)
+jest.mock('./../../api/fetchShow.js');
+
+const testShow = {
+  //add in approprate test data structure here.
+  name: 'Testo',
+  summary: 'man this is crazy',
+  seasons: [
+      {
+          id: 0,
+          name:'Testo',
+          episodes: []
+      },
+      {
+          id: 1,
+          name:'Testo Deux',
+          episodes: []
+      }
+  ],
+}
+
+test('render display component without errors', () => {
+  render(<Display />);
 })
 
-test()
+// no idea why this isnt working
+// fixed it by having mockFetchShow NOT in {} for import
+test('show component will display when fetch button is pressed', async () => {
+  mockFetchShow.mockResolvedValueOnce(testShow);
+  render(<Display />);
 
+  const btn = screen.getByRole('button');
+  userEvent.click(btn);
 
+  await waitFor(()=>{
+    const show = screen.getByTestId('show-container');
+    expect(show).toBeInTheDocument();
+  })
 
+  // const show = await screen.findByTestId("show-container");
+	// expect(show).toBeInTheDocument();
+})
 
+test('amount of select options rendered is equal to seasons in test data when fetch button is called', async () => {
+  mockFetchShow.mockResolvedValueOnce(testShow);
+  render(<Display />);
 
+  const btn = screen.getByRole('button');
+  userEvent.click(btn);
+  
+  await waitFor(()=>{
+    const seasonOptions = screen.queryAllByTestId('season-option');
+    expect(seasonOptions).toHaveLength(2);
+  })
+})
+
+test('display function is called when fetch button is pressed', async () => {
+	mockFetchShow.mockResolvedValueOnce(testShow);
+	const displayFunc = jest.fn();
+
+	render(<Display displayFunc={displayFunc} />);
+	const button = screen.getByRole("button");
+	userEvent.click(button);
+
+	await waitFor(() => {
+		expect(displayFunc).toHaveBeenCalled();
+	})
+})
 
 
 ///Tasks:
