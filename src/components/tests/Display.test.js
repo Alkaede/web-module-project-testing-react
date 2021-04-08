@@ -1,11 +1,12 @@
+import React from 'react';
+import {render, screen} from '@testing-library/react';
+import Display from '../Display';
 
+test('render display compoenent without errors', () => {
+  render(<Display />)
+})
 
-
-
-
-
-
-
+test()
 
 
 
